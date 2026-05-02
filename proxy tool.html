@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Proxy Dev Tool</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:sans-serif;
+padding:40px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+h2{
+margin-top:40px;
+}
+
+input, textarea{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:none;
+border-radius:6px;
+background:#1e293b;
+color:white;
+}
+
+button{
+padding:10px 20px;
+margin:5px;
+border:none;
+border-radius:6px;
+background:#2563eb;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+.output{
+background:#020617;
+padding:15px;
+margin-top:20px;
+border-radius:6px;
+word-break:break-all;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Proxy Developer Tool</h1>
+
+<h2>Proxy URL Builder</h2>
+
+<label>Proxy Endpoint</label>
+<input id="proxy" placeholder="https://proxy.dev/m3u8-proxy">
+
+<label>Target URL</label>
+<input id="url" placeholder="https://example.com/master.m3u8,.jpg">
+
+<h3>Header Builder (Optional)</h3>
+
+<div class="grid">
+
+<input id="ua" placeholder="User-Agent">
+
+<input id="referer" placeholder="Referer">
+
+<input id="origin" placeholder="Origin">
+
+<input id="cookie" placeholder="Cookie">
+
+<input id="auth" placeholder="Authorization">
+
+<input id="accept" placeholder="Accept">
+
+</div>
+
+<label>Extra Headers (JSON)</label>
+<textarea id="extraHeaders" placeholder='{"X-Custom":"value"}'></textarea>
+
+<button onclick="generate()">Generate Proxy URL</button>
+
+<div class="output" id="result"></div>
+
+
+
+<h2>URL Decryption Tool</h2>
+
+<label>Encoded URL</label>
+<input id="encodedUrl" placeholder="Paste encoded url">
+
+<label>Encoded Headers JSON</label>
+<textarea id="encodedHeaders"></textarea>
+
+<button onclick="decode()">Decrypt</button>
+
+<div class="output" id="decodeResult"></div>
+
+</div>
+
+
+<script>
+
+function generate(){
+
+const proxy = document.getElementById("proxy").value
+const url = document.getElementById("url").value
+
+const ua = document.getElementById("ua").value
+const referer = document.getElementById("referer").value
+const origin = document.getElementById("origin").value
+const cookie = document.getElementById("cookie").value
+const auth = document.getElementById("auth").value
+const accept = document.getElementById("accept").value
+const extraHeaders = document.getElementById("extraHeaders").value
+
+let headers = {}
+
+if(ua) headers["User-Agent"] = ua
+if(referer) headers["Referer"] = referer
+if(origin) headers["Origin"] = origin
+if(cookie) headers["Cookie"] = cookie
+if(auth) headers["Authorization"] = auth
+if(accept) headers["Accept"] = accept
+
+if(extraHeaders){
+
+try{
+
+const extra = JSON.parse(extraHeaders)
+headers = {...headers,...extra}
+
+}catch{
+
+alert("Invalid JSON")
+
+return
+
+}
+
+}
+
+const encodedUrl = encodeURIComponent(url)
+
+let final = proxy + encodedUrl
+
+if(Object.keys(headers).length){
+
+const encodedHeaders = encodeURIComponent(JSON.stringify(headers))
+
+final += "&headers=" + encodedHeaders
+
+}
+
+document.getElementById("result").innerText = final
+
+}
+
+
+
+function decode(){
+
+const url = document.getElementById("encodedUrl").value
+const headers = document.getElementById("encodedHeaders").value
+
+let result = ""
+
+try{
+
+result += "Decoded URL:\n" + decodeURIComponent(url)
+
+}catch{
+
+result += "Invalid encoded URL"
+
+}
+
+if(headers){
+
+try{
+
+const decodedHeaders = JSON.parse(decodeURIComponent(headers))
+
+result += "\n\nDecoded Headers:\n" + JSON.stringify(decodedHeaders,null,2)
+
+}catch{
+
+result += "\n\nInvalid headers"
+
+}
+
+}
+
+document.getElementById("decodeResult").innerText = result
+
+}
+
+</script>
+
+</body>
+</html>
