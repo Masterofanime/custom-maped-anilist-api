@@ -48,7 +48,7 @@ const transformAnime = (media) => {
 // --- ENDPOINTS ---
 
 // 1. GET Home Info (spotlights, trending, latest)
-app.get('/api', async (req, res) => {
+app.get('/api/home', async (req, res) => {
     const query = `query {
         trending: Page(page: 1, perPage: 10) { media(sort: TRENDING_DESC, type: ANIME) { id title { english romaji native } bannerImage coverImage { extraLarge } description format duration season seasonYear episodes } }
         popular: Page(page: 1, perPage: 10) { media(sort: POPULARITY_DESC, type: ANIME) { id title { english romaji native } coverImage { extraLarge } description format episodes } }
